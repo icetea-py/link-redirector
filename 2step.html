@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Redirecting...</title>
+  <script>
+    const id = new URLSearchParams(window.location.search).get("id");
+    const redirectMap = {
+      // BURAYA PYTHON EKLEYECEK
+    };
+
+    if (id && redirectMap[id]) {
+      window.location.replace(redirectMap[id]);
+    } else {
+      document.write("Yönlendirme bulunamadı.");
+    }
+  </script>
+</head>
+<body></body>
+</html>
