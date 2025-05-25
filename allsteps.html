@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Step 1 Verification</title>
+    <title>Linkvertise Multi-Step System</title>
     <style>
         :root {
             --rainbow-1: #ff0000;
@@ -15,6 +15,7 @@
             --rainbow-7: #9400d3;
             --spiderman-red: #e62429;
             --spiderman-blue: #2b6fbb;
+            --linkvertise-green: #00c853;
         }
         
         body {
@@ -43,19 +44,43 @@
             position: relative;
             z-index: 1;
             box-sizing: border-box;
-            transition: transform 0.3s;
+            transition: all 0.3s;
+            transform: scale(0.98);
+            opacity: 0;
+            animation: containerEnter 0.5s ease-out forwards;
         }
         
         h1 {
             margin-bottom: 1.5rem;
             color: #ffffff;
             font-size: clamp(1.5rem, 5vw, 2rem);
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
         }
         
         p {
             margin-bottom: 2rem;
             line-height: 1.6;
             font-size: clamp(0.9rem, 3vw, 1.1rem);
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .step-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #333;
+            transition: all 0.3s;
+        }
+        
+        .step-dot.active {
+            background: linear-gradient(135deg, var(--spiderman-red), var(--spiderman-blue));
+            transform: scale(1.3);
         }
         
         .loading-container {
@@ -263,6 +288,22 @@
             z-index: -1;
         }
         
+        .linkvertise-badge {
+            margin-top: 1.5rem;
+            padding: 5px 10px;
+            background-color: rgba(0, 200, 83, 0.1);
+            color: var(--linkvertise-green);
+            border: 1px solid var(--linkvertise-green);
+            border-radius: 5px;
+            font-size: 0.7rem;
+            display: inline-block;
+        }
+        
+        @keyframes containerEnter {
+            0% { transform: scale(0.98); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -367,6 +408,12 @@
     <div class="spider" style="left: 90%; animation-delay: 6s;"></div>
     
     <div class="container">
+        <div class="step-indicator">
+            <div class="step-dot" id="step1-dot"></div>
+            <div class="step-dot" id="step2-dot"></div>
+            <div class="step-dot" id="step3-dot"></div>
+        </div>
+        
         <h1 id="title">Complete Step 1</h1>
         <p id="description">Please wait while we verify your information and redirect you to the next step...</p>
         
@@ -384,12 +431,14 @@
         <div class="language-selector">
             <button class="language-btn active" onclick="setLanguage('en')">English</button>
             <button class="language-btn" onclick="setLanguage('es')">Español</button>
+            <button class="language-btn" onclick="setLanguage('tr')">Türkçe</button>
         </div>
         
         <p class="steps-info" id="steps-info">This process consists of 3 steps</p>
+        <div class="linkvertise-badge">Linkvertise Secure Redirect System</div>
         
         <div class="error-message" id="error-message"></div>
-        <button class="btn-back" id="btn-back">Go Back to Step 1</button>
+        <button class="btn-back" id="btn-back">Go Back to Previous Step</button>
     </div>
 
     <script>
@@ -398,34 +447,112 @@
         const nameParam = urlParams.get('name');
         let redirectTimer;
         let isAutoRedirect = true;
+        let currentStep = 1;
         
-        // Dil ayarları
+        // Dil ayarları (EN, ES, TR)
         const translations = {
             en: {
-                title: "Complete Step 1",
-                description: "Please wait while we verify your information and redirect you to the next step...",
-                btnContinue: "Continue to Step 2",
-                stepsInfo: "This process consists of 3 steps",
-                errorNoName: "Error: Missing name parameter in URL",
-                errorInvalidFormat: "Error: Invalid name format. Expected format: [group]-step1",
-                redirecting: "Redirecting to Step 2...",
-                errorRedirect: "Redirect failed! Please try again.",
-                goBackQuestion: "Go back to Step 1?"
+                step1: {
+                    title: "Complete Step 1",
+                    description: "Please wait while we verify your information and redirect you to the next step...",
+                    btnContinue: "Continue to Step 2",
+                    stepsInfo: "This process consists of 3 steps"
+                },
+                step2: {
+                    title: "Complete Step 2",
+                    description: "Almost there! Please wait while we prepare the final step...",
+                    btnContinue: "Continue to Final Step",
+                    stepsInfo: "Step 2 of 3 completed"
+                },
+                step3: {
+                    title: "Final Step",
+                    description: "Congratulations! You're being redirected to your destination...",
+                    btnContinue: "Complete Now",
+                    stepsInfo: "All steps completed successfully"
+                },
+                errors: {
+                    noName: "Error: Missing name parameter in URL",
+                    invalidFormat: "Error: Invalid name format. Expected format: [group]-step[1-3]",
+                    redirecting: "Redirecting to next step...",
+                    redirectFailed: "Redirect failed! Please try again.",
+                    goBackQuestion: "Go back to previous step?"
+                }
             },
             es: {
-                title: "Complete el Paso 1",
-                description: "Espere mientras verificamos su información y lo redirigimos al siguiente paso...",
-                btnContinue: "Continuar al Paso 2",
-                stepsInfo: "Este proceso consta de 3 pasos",
-                errorNoName: "Error: Falta el parámetro de nombre en la URL",
-                errorInvalidFormat: "Error: Formato de nombre no válido. Formato esperado: [grupo]-step1",
-                redirecting: "Redirigiendo al Paso 2...",
-                errorRedirect: "¡Redirección fallida! Por favor, inténtelo de nuevo.",
-                goBackQuestion: "¿Volver al Paso 1?"
+                step1: {
+                    title: "Complete el Paso 1",
+                    description: "Espere mientras verificamos su información y lo redirigimos al siguiente paso...",
+                    btnContinue: "Continuar al Paso 2",
+                    stepsInfo: "Este proceso consta de 3 pasos"
+                },
+                step2: {
+                    title: "Complete el Paso 2",
+                    description: "¡Casi terminamos! Espere mientras preparamos el paso final...",
+                    btnContinue: "Continuar al Paso Final",
+                    stepsInfo: "Paso 2 de 3 completado"
+                },
+                step3: {
+                    title: "Paso Final",
+                    description: "¡Felicidades! Está siendo redirigido a su destino...",
+                    btnContinue: "Completar Ahora",
+                    stepsInfo: "Todos los pasos completados con éxito"
+                },
+                errors: {
+                    noName: "Error: Falta el parámetro de nombre en la URL",
+                    invalidFormat: "Error: Formato de nombre no válido. Formato esperado: [grupo]-step[1-3]",
+                    redirecting: "Redirigiendo al siguiente paso...",
+                    redirectFailed: "¡Redirección fallida! Por favor, inténtelo de nuevo.",
+                    goBackQuestion: "¿Volver al paso anterior?"
+                }
+            },
+            tr: {
+                step1: {
+                    title: "1. Adımı Tamamla",
+                    description: "Bilgileriniz doğrulanırken lütfen bekleyin, sizi bir sonraki adıma yönlendiriyoruz...",
+                    btnContinue: "2. Adıma Geç",
+                    stepsInfo: "Bu işlem 3 adımdan oluşur"
+                },
+                step2: {
+                    title: "2. Adımı Tamamla",
+                    description: "Neredeyse bitti! Son adım için hazırlık yapılırken lütfen bekleyin...",
+                    btnContinue: "Son Adıma Geç",
+                    stepsInfo: "3 adımdan 2'si tamamlandı"
+                },
+                step3: {
+                    title: "Son Adım",
+                    description: "Tebrikler! Hedef sayfaya yönlendiriliyorsunuz...",
+                    btnContinue: "Hemen Tamamla",
+                    stepsInfo: "Tüm adımlar başarıyla tamamlandı"
+                },
+                errors: {
+                    noName: "Hata: URL'de name parametresi eksik",
+                    invalidFormat: "Hata: Geçersiz name formatı. Beklenen format: [grup]-step[1-3]",
+                    redirecting: "Sonraki adıma yönlendiriliyor...",
+                    redirectFailed: "Yönlendirme başarısız! Lütfen tekrar deneyin.",
+                    goBackQuestion: "Önceki adıma dönmek ister misiniz?"
+                }
             }
         };
         
         let currentLanguage = 'en';
+        
+        // Adım tespiti yap
+        function detectStep() {
+            if (!nameParam) return 1;
+            
+            if (nameParam.match(/-step1$/i)) return 1;
+            if (nameParam.match(/-step2$/i)) return 2;
+            if (nameParam.match(/-step3$/i) || nameParam.match(/-final-step$/i)) return 3;
+            
+            return 1;
+        }
+        
+        // Adım göstergelerini güncelle
+        function updateStepIndicators() {
+            document.getElementById('step1-dot').classList.toggle('active', currentStep >= 1);
+            document.getElementById('step2-dot').classList.toggle('active', currentStep >= 2);
+            document.getElementById('step3-dot').classList.toggle('active', currentStep >= 3);
+        }
         
         // Hata mesajını göster
         function showError(message, showBackButton = false) {
@@ -441,7 +568,7 @@
             // Geri düğmesini göster/gizle
             const backBtn = document.getElementById('btn-back');
             backBtn.style.display = showBackButton ? 'inline-block' : 'none';
-            backBtn.textContent = translations[currentLanguage].goBackQuestion;
+            backBtn.textContent = translations[currentLanguage].errors.goBackQuestion;
             
             // Otomatik yönlendirmeyi iptal et
             clearTimeout(redirectTimer);
@@ -456,7 +583,8 @@
             // Aktif butonu güncelle
             document.querySelectorAll('.language-btn').forEach(btn => {
                 btn.classList.remove('active');
-                if (btn.textContent.toLowerCase() === (lang === 'en' ? 'english' : 'español')) {
+                if (btn.textContent.toLowerCase() === 
+                    (lang === 'en' ? 'english' : lang === 'es' ? 'español' : 'türkçe')) {
                     btn.classList.add('active');
                 }
             });
@@ -464,30 +592,43 @@
         
         // Metinleri güncelle
         function updateTexts() {
-            document.getElementById('title').textContent = translations[currentLanguage].title;
-            document.getElementById('description').textContent = translations[currentLanguage].description;
-            document.getElementById('btn-continue').textContent = translations[currentLanguage].btnContinue;
-            document.getElementById('steps-info').textContent = translations[currentLanguage].stepsInfo;
+            const stepTexts = translations[currentLanguage][`step${currentStep}`];
+            document.getElementById('title').textContent = stepTexts.title;
+            document.getElementById('description').textContent = stepTexts.description;
+            document.getElementById('btn-continue').textContent = stepTexts.btnContinue;
+            document.getElementById('steps-info').textContent = stepTexts.stepsInfo;
         }
         
         // Yönlendirme işlemi
-        function redirectToStep2() {
+        function redirectToNextStep() {
             if (!nameParam) {
-                showError(translations[currentLanguage].errorNoName, true);
+                showError(translations[currentLanguage].errors.noName, true);
                 return false;
             }
             
-            // Name parametresini doğrula (format: [herhangi bir şey]-step1)
-            if (!nameParam.match(/.+-step1$/i)) {
-                showError(translations[currentLanguage].errorInvalidFormat, true);
+            // Name parametresini doğrula
+            if (!nameParam.match(/.+-step[1-3]$/i) && !nameParam.match(/.+-final-step$/i)) {
+                showError(translations[currentLanguage].errors.invalidFormat, true);
                 return false;
             }
             
-            // Step2 adını oluştur (name-step1 → name-step2)
-            const step2Name = nameParam.replace('-step1', '-step2');
+            document.getElementById('description').textContent = translations[currentLanguage].errors.redirecting;
             
-            document.getElementById('description').textContent = translations[currentLanguage].redirecting;
-            window.location.href = `https://link-hub.net/1351151/${step2Name}`;
+            // Bir sonraki adımın linkini oluştur
+            let nextStepUrl;
+            if (currentStep === 1) {
+                const step2Name = nameParam.replace('-step1', '-step2');
+                nextStepUrl = `https://link-hub.net/1351151/${step2Name}`;
+            } else if (currentStep === 2) {
+                const finalStepName = nameParam.replace('-step2', '-final-step');
+                nextStepUrl = `https://link-hub.net/1351151/${finalStepName}`;
+            } else {
+                // Final step için özel URL (kendi Linkvertise final linkinizi buraya ekleyin)
+                nextStepUrl = `https://linkvertise.com/YOUR_FINAL_LINK`;
+            }
+            
+            // Yönlendirme yap
+            window.location.href = nextStepUrl;
             return true;
         }
         
@@ -496,16 +637,17 @@
             if (!isAutoRedirect) return;
             
             redirectTimer = setTimeout(() => {
-                const success = redirectToStep2();
+                const success = redirectToNextStep();
                 if (!success) {
-                    // Yönlendirme başarısız olduysa kullanıcıya bilgi ver
-                    document.getElementById('description').textContent = translations[currentLanguage].errorRedirect;
+                    document.getElementById('description').textContent = translations[currentLanguage].errors.redirectFailed;
                 }
             }, 5000); // 5 saniye sonra
         }
         
         // Sayfa yüklendiğinde çalıştır
         window.onload = function() {
+            currentStep = detectStep();
+            updateStepIndicators();
             updateTexts();
             startAutoRedirect();
             
@@ -513,12 +655,15 @@
             document.getElementById('btn-continue').addEventListener('click', function() {
                 isAutoRedirect = false;
                 clearTimeout(redirectTimer);
-                redirectToStep2();
+                redirectToNextStep();
             });
             
             // Back butonu event listener
             document.getElementById('btn-back').addEventListener('click', function() {
-                window.location.href = window.location.href.split('?')[0] + '?name=' + nameParam;
+                if (currentStep > 1) {
+                    window.location.href = window.location.href.split('?')[0] + '?name=' + 
+                        nameParam.replace(`-step${currentStep}`, `-step${currentStep-1}`);
+                }
             });
         };
         
@@ -526,4 +671,4 @@
         document.addEventListener('touchstart', function() {}, {passive: true});
     </script>
 </body>
-    </html>
+</html>
