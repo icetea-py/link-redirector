@@ -3,18 +3,50 @@
 <head>
   <meta charset="UTF-8">
   <title>Redirecting...</title>
-  <script>
-    const id = new URLSearchParams(window.location.search).get("id");
-    const redirectMap = {
-      // BURAYA PYTHON EKLEYECEK
-    };
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #0d1117;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      flex-direction: column;
+    }
+    .loader {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #3498db;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="loader"></div>
+  <div id="message">Please complete Step 2...</div>
 
-    if (id && redirectMap[id]) {
-      window.location.replace(redirectMap[id]);
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const fullName = params.get("name");
+
+    if (fullName && fullName.toLowerCase().endsWith("step1")) {
+      const baseName = fullName.replace(/step1$/i, "").trim();
+      const nextName = `${baseName} step2`;
+      setTimeout(() => {
+        window.location.href = `https://icetea-py.github.io/link-redirector/2step.html?name=${encodeURIComponent(nextName)}`;
+      }, 4000);
     } else {
-      document.write("Yönlendirme bulunamadı.");
+      document.getElementById("message").textContent = "Invalid or missing parameter: name=...step1";
     }
   </script>
-</head>
-<body></body>
+</body>
 </html>
