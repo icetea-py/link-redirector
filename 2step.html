@@ -1,76 +1,310 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Redirecting - Final Step</title>
-  <style>
-    body {
-      margin: 0;
-      background-color: #0d0d0d;
-      font-family: 'Segoe UI', sans-serif;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
-
-    .loader {
-      border: 8px solid #333;
-      border-top: 8px solid #00ff88;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .progress-bar {
-      width: 80%;
-      background: #333;
-      border-radius: 5px;
-      overflow: hidden;
-      margin-top: 20px;
-    }
-
-    .progress-bar-fill {
-      width: 0%;
-      height: 12px;
-      background: #00ff88;
-      animation: fillBar 4s linear forwards;
-    }
-
-    @keyframes fillBar {
-      100% { width: 100%; }
-    }
-
-    .message {
-      margin-top: 30px;
-      text-align: center;
-      font-size: 1.2em;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 2 Verification</title>
+    <style>
+        :root {
+            --rainbow-1: #ff0000;
+            --rainbow-2: #ff7f00;
+            --rainbow-3: #ffff00;
+            --rainbow-4: #00ff00;
+            --rainbow-5: #0000ff;
+            --rainbow-6: #4b0082;
+            --rainbow-7: #9400d3;
+        }
+        
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 600px;
+            padding: 2rem;
+            border-radius: 10px;
+            background-color: #1e1e1e;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 1;
+        }
+        
+        h1 {
+            margin-bottom: 1.5rem;
+            color: #ffffff;
+        }
+        
+        p {
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .loading-container {
+            width: 100%;
+            margin: 2rem 0;
+        }
+        
+        .loading-bar {
+            height: 8px;
+            width: 100%;
+            background-color: #333;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .loading-progress {
+            height: 100%;
+            width: 0;
+            border-radius: 4px;
+            background: linear-gradient(90deg, 
+                var(--rainbow-1), 
+                var(--rainbow-2), 
+                var(--rainbow-3), 
+                var(--rainbow-4), 
+                var(--rainbow-5), 
+                var(--rainbow-6), 
+                var(--rainbow-7));
+            background-size: 200% 100%;
+            animation: rainbow 2s linear infinite, fill 3s ease-in-out forwards;
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            margin: 2rem auto;
+            border: 6px solid #333;
+            border-top-color: var(--rainbow-1);
+            border-radius: 50%;
+            animation: spin 1s linear infinite, rainbow-border 4s linear infinite;
+            position: relative;
+        }
+        
+        .spinner::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border-radius: 50%;
+            background: radial-gradient(circle, transparent 50%, rgba(255,255,255,0.1) 100%);
+            animation: pulse 2s ease-out infinite;
+        }
+        
+        .language-selector {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .language-btn {
+            padding: 0.5rem 1rem;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .language-btn:hover {
+            background-color: #444;
+        }
+        
+        .language-btn.active {
+            background: linear-gradient(90deg, var(--rainbow-1), var(--rainbow-3), var(--rainbow-5));
+            background-size: 200% 200%;
+            animation: gradient 3s ease infinite;
+        }
+        
+        .error-message {
+            color: #ff4444;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes rainbow-border {
+            0% { border-top-color: var(--rainbow-1); }
+            14% { border-top-color: var(--rainbow-2); }
+            28% { border-top-color: var(--rainbow-3); }
+            42% { border-top-color: var(--rainbow-4); }
+            57% { border-top-color: var(--rainbow-5); }
+            71% { border-top-color: var(--rainbow-6); }
+            85% { border-top-color: var(--rainbow-7); }
+            100% { border-top-color: var(--rainbow-1); }
+        }
+        
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+        
+        @keyframes fill {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.7; }
+            70% { transform: scale(1.05); opacity: 0.3; }
+            100% { transform: scale(0.95); opacity: 0.7; }
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: radial-gradient(circle at center, 
+                rgba(255, 0, 0, 0.1) 0%, 
+                rgba(255, 127, 0, 0.1) 20%, 
+                rgba(255, 255, 0, 0.1) 40%, 
+                rgba(0, 255, 0, 0.1) 60%, 
+                rgba(0, 0, 255, 0.1) 80%, 
+                transparent 100%);
+            animation: glow-move 10s linear infinite;
+            z-index: -1;
+        }
+        
+        @keyframes glow-move {
+            0% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(90deg) scale(1.2); }
+            50% { transform: rotate(180deg) scale(1); }
+            75% { transform: rotate(270deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+    </style>
 </head>
 <body>
-  <div class="loader"></div>
-  <div class="progress-bar"><div class="progress-bar-fill"></div></div>
-  <div class="message">
-    Final step... Please wait to get your link.<br>
-    Paso final... Por favor espera para obtener tu enlace.
-  </div>
+    <div class="glow"></div>
+    <div class="container">
+        <h1 id="title">Complete Step 2</h1>
+        <p id="description">Please wait while we verify your information and redirect you to the final step...</p>
+        
+        <div class="loading-container">
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+            <div class="spinner"></div>
+        </div>
+        
+        <div class="language-selector">
+            <button class="language-btn active" onclick="setLanguage('en')">English</button>
+            <button class="language-btn" onclick="setLanguage('es')">Español</button>
+        </div>
+        
+        <p class="error-message" id="error-message"></p>
+    </div>
 
-  <script>
-    setTimeout(() => {
-      let currentURL = window.location.href;
-      let finalURL = "https://final-link.com"; // burayı senin son linkinle değiştir
-      window.location.href = finalURL;
-    }, 4000);
-  </script>
+    <script>
+        // URL parametrelerini kontrol et
+        const urlParams = new URLSearchParams(window.location.search);
+        const nameParam = urlParams.get('name');
+        
+        // Dil ayarları
+        const translations = {
+            en: {
+                title: "Complete Step 2",
+                description: "Please wait while we verify your information and redirect you to the final step...",
+                errorNoName: "Error: Missing name parameter in URL",
+                errorInvalidFormat: "Error: Invalid name format. Expected format: [group]-step2",
+                redirecting: "Redirecting to Final Step..."
+            },
+            es: {
+                title: "Complete el Paso 2",
+                description: "Espere mientras verificamos su información y lo redirigimos al paso final...",
+                errorNoName: "Error: Falta el parámetro de nombre en la URL",
+                errorInvalidFormat: "Error: Formato de nombre no válido. Formato esperado: [grupo]-step2",
+                redirecting: "Redirigiendo al Paso Final..."
+            }
+        };
+        
+        let currentLanguage = 'en';
+        
+        // Hata mesajını göster
+        function showError(message) {
+            const errorElement = document.getElementById('error-message');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            
+            // Hata durumunda loading animasyonlarını durdur
+            document.querySelector('.loading-progress').style.animation = 'none';
+            document.querySelector('.spinner').style.animation = 'none';
+            document.querySelector('.spinner').style.borderTopColor = '#ff4444';
+        }
+        
+        // Dil ayarlarını güncelle
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            updateTexts();
+            
+            // Aktif butonu güncelle
+            document.querySelectorAll('.language-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.toLowerCase() === (lang === 'en' ? 'english' : 'español')) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+        
+        // Metinleri güncelle
+        function updateTexts() {
+            document.getElementById('title').textContent = translations[currentLanguage].title;
+            document.getElementById('description').textContent = translations[currentLanguage].description;
+        }
+        
+        // Yönlendirme işlemi
+        function redirectToFinalStep() {
+            if (!nameParam) {
+                showError(translations[currentLanguage].errorNoName);
+                return;
+            }
+            
+            // Name parametresini doğrula (format: [herhangi bir şey]-step2)
+            if (!nameParam.match(/.+-step2$/i)) {
+                showError(translations[currentLanguage].errorInvalidFormat);
+                return;
+            }
+            
+            // Final step adını oluştur (name-step2 → name-final-step)
+            const finalStepName = nameParam.replace('-step2', '-final-step');
+            
+            // 3 saniye sonra yönlendir
+            setTimeout(() => {
+                document.getElementById('description').textContent = translations[currentLanguage].redirecting;
+                window.location.href = `https://link-hub.net/1351151/${finalStepName}`;
+            }, 3000);
+        }
+        
+        // Sayfa yüklendiğinde çalıştır
+        window.onload = function() {
+            updateTexts();
+            redirectToFinalStep();
+        };
+    </script>
 </body>
 </html>
