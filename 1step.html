@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Step 1 Verification</title>
     <style>
         :root {
@@ -13,6 +13,8 @@
             --rainbow-5: #0000ff;
             --rainbow-6: #4b0082;
             --rainbow-7: #9400d3;
+            --spiderman-red: #e62429;
+            --spiderman-blue: #2b6fbb;
         }
         
         body {
@@ -23,50 +25,59 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            padding: 20px;
             overflow: hidden;
             text-align: center;
+            -webkit-tap-highlight-color: transparent;
         }
         
         .container {
+            width: 100%;
             max-width: 600px;
             padding: 2rem;
-            border-radius: 10px;
+            border-radius: 15px;
             background-color: #1e1e1e;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
             position: relative;
             z-index: 1;
+            box-sizing: border-box;
+            transition: transform 0.3s;
         }
         
         h1 {
             margin-bottom: 1.5rem;
             color: #ffffff;
+            font-size: clamp(1.5rem, 5vw, 2rem);
         }
         
         p {
             margin-bottom: 2rem;
             line-height: 1.6;
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
         }
         
         .loading-container {
             width: 100%;
             margin: 2rem 0;
+            position: relative;
         }
         
         .loading-bar {
-            height: 8px;
+            height: 12px;
             width: 100%;
             background-color: #333;
-            border-radius: 4px;
+            border-radius: 6px;
             overflow: hidden;
             position: relative;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
         
         .loading-progress {
             height: 100%;
             width: 0;
-            border-radius: 4px;
+            border-radius: 6px;
             background: linear-gradient(90deg, 
                 var(--rainbow-1), 
                 var(--rainbow-2), 
@@ -76,7 +87,24 @@
                 var(--rainbow-6), 
                 var(--rainbow-7));
             background-size: 200% 100%;
-            animation: rainbow 2s linear infinite, fill 3s ease-in-out forwards;
+            animation: rainbow 2s linear infinite, fill 5s ease-in-out forwards;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .spiderman {
+            position: absolute;
+            right: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="%23e62429" d="M50 10L20 50l30 40 30-40z"/><path fill="%232b6fbb" d="M50 10l30 40H20z"/><circle fill="%23ffffff" cx="50" cy="50" r="10"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            animation: swing 0.5s ease-in-out infinite alternate;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.7));
+            z-index: 2;
         }
         
         .spinner {
@@ -102,11 +130,54 @@
             animation: pulse 2s ease-out infinite;
         }
         
+        .btn-continue {
+            padding: 12px 25px;
+            margin: 1rem 0;
+            background: linear-gradient(135deg, var(--spiderman-red), var(--spiderman-blue));
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-continue:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        .btn-continue:active {
+            transform: translateY(1px);
+        }
+        
+        .btn-continue::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0) 45%,
+                rgba(255, 255, 255, 0.8) 50%,
+                rgba(255, 255, 255, 0) 55%
+            );
+            transform: rotate(30deg);
+            animation: shine 3s infinite;
+        }
+        
         .language-selector {
             margin-top: 1.5rem;
             display: flex;
             justify-content: center;
             gap: 1rem;
+            flex-wrap: wrap;
         }
         
         .language-btn {
@@ -114,9 +185,10 @@
             background-color: #333;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 20px;
             cursor: pointer;
             transition: all 0.3s;
+            font-size: 0.9rem;
         }
         
         .language-btn:hover {
@@ -132,7 +204,63 @@
         .error-message {
             color: #ff4444;
             margin-top: 1rem;
+            padding: 1rem;
+            background-color: rgba(255, 0, 0, 0.1);
+            border-radius: 8px;
             display: none;
+            animation: shake 0.5s;
+        }
+        
+        .steps-info {
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            color: #888;
+            opacity: 0.8;
+        }
+        
+        .btn-back {
+            margin-top: 1rem;
+            padding: 8px 15px;
+            background-color: transparent;
+            color: #ff4444;
+            border: 1px solid #ff4444;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: none;
+        }
+        
+        .btn-back:hover {
+            background-color: rgba(255, 0, 0, 0.1);
+        }
+        
+        .web-mask {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: radial-gradient(circle at center, 
+                rgba(255, 0, 0, 0.05) 0%, 
+                rgba(255, 127, 0, 0.05) 20%, 
+                rgba(255, 255, 0, 0.05) 40%, 
+                rgba(0, 255, 0, 0.05) 60%, 
+                rgba(0, 0, 255, 0.05) 80%, 
+                transparent 100%);
+            animation: web-move 15s linear infinite;
+            z-index: -1;
+            opacity: 0.5;
+        }
+        
+        .spider {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%23121212" stroke="%23e62429" stroke-width="2"/><circle cx="50" cy="50" r="20" fill="%23e62429"/><path d="M50 10L50 30M50 70L50 90M10 50L30 50M70 50L90 50" stroke="%23e62429" stroke-width="3" stroke-linecap="round"/></svg>');
+            background-size: contain;
+            animation: spider-drop 10s linear infinite;
+            opacity: 0.7;
+            z-index: -1;
         }
         
         @keyframes spin {
@@ -173,80 +301,134 @@
             100% { background-position: 0% 50%; }
         }
         
-        .glow {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            background: radial-gradient(circle at center, 
-                rgba(255, 0, 0, 0.1) 0%, 
-                rgba(255, 127, 0, 0.1) 20%, 
-                rgba(255, 255, 0, 0.1) 40%, 
-                rgba(0, 255, 0, 0.1) 60%, 
-                rgba(0, 0, 255, 0.1) 80%, 
-                transparent 100%);
-            animation: glow-move 10s linear infinite;
-            z-index: -1;
+        @keyframes web-move {
+            0% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(90deg) scale(1.1); }
+            50% { transform: rotate(180deg) scale(1); }
+            75% { transform: rotate(270deg) scale(1.1); }
+            100% { transform: rotate(360deg) scale(1); }
         }
         
-        @keyframes glow-move {
-            0% { transform: rotate(0deg) scale(1); }
-            25% { transform: rotate(90deg) scale(1.2); }
-            50% { transform: rotate(180deg) scale(1); }
-            75% { transform: rotate(270deg) scale(1.2); }
-            100% { transform: rotate(360deg) scale(1); }
+        @keyframes spider-drop {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(calc(100vh + 100px)) rotate(360deg); opacity: 0; }
+        }
+        
+        @keyframes swing {
+            0% { transform: translateY(-50%) rotate(-10deg); }
+            100% { transform: translateY(-50%) rotate(10deg); }
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(30deg); }
+            20% { transform: translateX(100%) rotate(30deg); }
+            100% { transform: translateX(100%) rotate(30deg); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 1.5rem;
+                border-radius: 10px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .btn-continue {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .loading-bar {
+                height: 10px;
+            }
+            
+            .spinner {
+                width: 50px;
+                height: 50px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="glow"></div>
+    <div class="web-mask"></div>
+    <div class="spider" style="left: 10%; animation-delay: 0s;"></div>
+    <div class="spider" style="left: 30%; animation-delay: 2s;"></div>
+    <div class="spider" style="left: 70%; animation-delay: 4s;"></div>
+    <div class="spider" style="left: 90%; animation-delay: 6s;"></div>
+    
     <div class="container">
         <h1 id="title">Complete Step 1</h1>
         <p id="description">Please wait while we verify your information and redirect you to the next step...</p>
         
         <div class="loading-container">
             <div class="loading-bar">
-                <div class="loading-progress"></div>
+                <div class="loading-progress">
+                    <div class="spiderman"></div>
+                </div>
             </div>
             <div class="spinner"></div>
         </div>
+        
+        <button class="btn-continue" id="btn-continue">Continue to Step 2</button>
         
         <div class="language-selector">
             <button class="language-btn active" onclick="setLanguage('en')">English</button>
             <button class="language-btn" onclick="setLanguage('es')">Español</button>
         </div>
         
-        <p class="error-message" id="error-message"></p>
+        <p class="steps-info" id="steps-info">This process consists of 3 steps</p>
+        
+        <div class="error-message" id="error-message"></div>
+        <button class="btn-back" id="btn-back">Go Back to Step 1</button>
     </div>
 
     <script>
         // URL parametrelerini kontrol et
         const urlParams = new URLSearchParams(window.location.search);
         const nameParam = urlParams.get('name');
+        let redirectTimer;
+        let isAutoRedirect = true;
         
         // Dil ayarları
         const translations = {
             en: {
                 title: "Complete Step 1",
                 description: "Please wait while we verify your information and redirect you to the next step...",
+                btnContinue: "Continue to Step 2",
+                stepsInfo: "This process consists of 3 steps",
                 errorNoName: "Error: Missing name parameter in URL",
                 errorInvalidFormat: "Error: Invalid name format. Expected format: [group]-step1",
-                redirecting: "Redirecting to Step 2..."
+                redirecting: "Redirecting to Step 2...",
+                errorRedirect: "Redirect failed! Please try again.",
+                goBackQuestion: "Go back to Step 1?"
             },
             es: {
                 title: "Complete el Paso 1",
                 description: "Espere mientras verificamos su información y lo redirigimos al siguiente paso...",
+                btnContinue: "Continuar al Paso 2",
+                stepsInfo: "Este proceso consta de 3 pasos",
                 errorNoName: "Error: Falta el parámetro de nombre en la URL",
                 errorInvalidFormat: "Error: Formato de nombre no válido. Formato esperado: [grupo]-step1",
-                redirecting: "Redirigiendo al Paso 2..."
+                redirecting: "Redirigiendo al Paso 2...",
+                errorRedirect: "¡Redirección fallida! Por favor, inténtelo de nuevo.",
+                goBackQuestion: "¿Volver al Paso 1?"
             }
         };
         
         let currentLanguage = 'en';
         
         // Hata mesajını göster
-        function showError(message) {
+        function showError(message, showBackButton = false) {
             const errorElement = document.getElementById('error-message');
             errorElement.textContent = message;
             errorElement.style.display = 'block';
@@ -255,6 +437,15 @@
             document.querySelector('.loading-progress').style.animation = 'none';
             document.querySelector('.spinner').style.animation = 'none';
             document.querySelector('.spinner').style.borderTopColor = '#ff4444';
+            
+            // Geri düğmesini göster/gizle
+            const backBtn = document.getElementById('btn-back');
+            backBtn.style.display = showBackButton ? 'inline-block' : 'none';
+            backBtn.textContent = translations[currentLanguage].goBackQuestion;
+            
+            // Otomatik yönlendirmeyi iptal et
+            clearTimeout(redirectTimer);
+            isAutoRedirect = false;
         }
         
         // Dil ayarlarını güncelle
@@ -275,36 +466,64 @@
         function updateTexts() {
             document.getElementById('title').textContent = translations[currentLanguage].title;
             document.getElementById('description').textContent = translations[currentLanguage].description;
+            document.getElementById('btn-continue').textContent = translations[currentLanguage].btnContinue;
+            document.getElementById('steps-info').textContent = translations[currentLanguage].stepsInfo;
         }
         
         // Yönlendirme işlemi
         function redirectToStep2() {
             if (!nameParam) {
-                showError(translations[currentLanguage].errorNoName);
-                return;
+                showError(translations[currentLanguage].errorNoName, true);
+                return false;
             }
             
             // Name parametresini doğrula (format: [herhangi bir şey]-step1)
             if (!nameParam.match(/.+-step1$/i)) {
-                showError(translations[currentLanguage].errorInvalidFormat);
-                return;
+                showError(translations[currentLanguage].errorInvalidFormat, true);
+                return false;
             }
             
             // Step2 adını oluştur (name-step1 → name-step2)
             const step2Name = nameParam.replace('-step1', '-step2');
             
-            // 3 saniye sonra yönlendir
-            setTimeout(() => {
-                document.getElementById('description').textContent = translations[currentLanguage].redirecting;
-                window.location.href = `https://link-hub.net/1351151/${step2Name}`;
-            }, 3000);
+            document.getElementById('description').textContent = translations[currentLanguage].redirecting;
+            window.location.href = `https://link-hub.net/1351151/${step2Name}`;
+            return true;
+        }
+        
+        // Otomatik yönlendirmeyi başlat
+        function startAutoRedirect() {
+            if (!isAutoRedirect) return;
+            
+            redirectTimer = setTimeout(() => {
+                const success = redirectToStep2();
+                if (!success) {
+                    // Yönlendirme başarısız olduysa kullanıcıya bilgi ver
+                    document.getElementById('description').textContent = translations[currentLanguage].errorRedirect;
+                }
+            }, 5000); // 5 saniye sonra
         }
         
         // Sayfa yüklendiğinde çalıştır
         window.onload = function() {
             updateTexts();
-            redirectToStep2();
+            startAutoRedirect();
+            
+            // Continue butonu event listener
+            document.getElementById('btn-continue').addEventListener('click', function() {
+                isAutoRedirect = false;
+                clearTimeout(redirectTimer);
+                redirectToStep2();
+            });
+            
+            // Back butonu event listener
+            document.getElementById('btn-back').addEventListener('click', function() {
+                window.location.href = window.location.href.split('?')[0] + '?name=' + nameParam;
+            });
         };
+        
+        // Mobil dokunmatik etkileşimler için
+        document.addEventListener('touchstart', function() {}, {passive: true});
     </script>
 </body>
-</html>
+    </html>
