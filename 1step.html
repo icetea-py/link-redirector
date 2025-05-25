@@ -2,80 +2,96 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <title>Redirecting...</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Redirecting - Step 1</title>
   <style>
     body {
-      margin: 0;
-      background-color: #0d0d0d;
+      background: #0f0f0f;
+      color: white;
       font-family: 'Segoe UI', sans-serif;
-      color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
-    }
-
-    .loader {
-      border: 8px solid #333;
-      border-top: 8px solid #00ccff;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .progress-bar {
-      width: 80%;
-      background: #333;
-      border-radius: 5px;
       overflow: hidden;
-      margin-top: 20px;
     }
 
-    .progress-bar-fill {
-      width: 0%;
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    #bar-container {
+      width: 80%;
       height: 12px;
-      background: #00ccff;
-      animation: fillBar 4s linear forwards;
+      background: #333;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0,0,0,0.8);
     }
 
-    @keyframes fillBar {
+    #bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, red, orange, yellow, green, cyan, blue, violet);
+      animation: glowing 2s linear infinite, loading 3s forwards;
+    }
+
+    @keyframes glowing {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
+    }
+
+    @keyframes loading {
+      0% { width: 0%; }
       100% { width: 100%; }
     }
 
-    .message {
-      margin-top: 30px;
+    .lang {
+      margin-top: 15px;
       text-align: center;
-      font-size: 1.2em;
+      font-size: 1rem;
     }
   </style>
 </head>
 <body>
-  <div class="loader"></div>
-  <div class="progress-bar"><div class="progress-bar-fill"></div></div>
-  <div class="message">
-    Please wait... Redirecting to the next step.<br>
-    Por favor espera... Redirigiendo al siguiente paso.
+  <h1 id="msg">Redirecting... Please complete step 2.</h1>
+  <div id="bar-container">
+    <div id="bar"></div>
   </div>
+  <div class="lang" id="msg-es">Redirigiendo... Por favor, completa el paso 2.</div>
 
   <script>
-    setTimeout(() => {
-      let currentURL = window.location.href;
-      let lowerURL = currentURL.toLowerCase();
-      if (lowerURL.includes("step1")) {
-        let nextURL = currentURL.replace(/step1/i, "step2");
-        window.location.href = nextURL;
-      } else {
-        document.querySelector('.message').innerHTML = "Invalid or missing parameter: step1 not found.";
+    function extractStep(url) {
+      const regex = /\/([^\/?#]+)-step1/i;
+      const match = url.match(regex);
+      if (match && match[1]) {
+        return match[1].toLowerCase();
       }
-    }, 4000);
+      return null;
+    }
+
+    function redirectToStep2(stepName) {
+      const base = "https://linkvertise.com/1351151/";
+      const target = base + stepName + "-step2";
+      setTimeout(() => {
+        window.location.href = target;
+      }, 4000); // 4 saniye
+    }
+
+    // Main
+    const currentUrl = window.location.href;
+    const stepName = extractStep(currentUrl);
+
+    if (stepName) {
+      redirectToStep2(stepName);
+    } else {
+      document.getElementById('msg').innerText = "Error: Missing or invalid step1 name.";
+      document.getElementById('msg-es').innerText = "Error: Nombre de paso1 no válido o faltante.";
+      document.getElementById('bar').style.display = "none";
+    }
   </script>
 </body>
 </html>
