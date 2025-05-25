@@ -1,52 +1,76 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Redirecting...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirecting - Final Step</title>
   <style>
     body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
       margin: 0;
-      background-color: #0d1117;
-      color: #ffffff;
-      font-family: Arial, sans-serif;
+      background-color: #0d0d0d;
+      font-family: 'Segoe UI', sans-serif;
+      color: #fff;
+      display: flex;
       flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
     }
+
     .loader {
-      border: 6px solid #f3f3f3;
-      border-top: 6px solid #3498db;
+      border: 8px solid #333;
+      border-top: 8px solid #00ff88;
       border-radius: 50%;
-      width: 50px;
-      height: 50px;
+      width: 60px;
+      height: 60px;
       animation: spin 1s linear infinite;
-      margin-bottom: 20px;
     }
+
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
+    }
+
+    .progress-bar {
+      width: 80%;
+      background: #333;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+
+    .progress-bar-fill {
+      width: 0%;
+      height: 12px;
+      background: #00ff88;
+      animation: fillBar 4s linear forwards;
+    }
+
+    @keyframes fillBar {
+      100% { width: 100%; }
+    }
+
+    .message {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 1.2em;
     }
   </style>
 </head>
 <body>
   <div class="loader"></div>
-  <div id="message">Please complete Step 2...</div>
+  <div class="progress-bar"><div class="progress-bar-fill"></div></div>
+  <div class="message">
+    Final step... Please wait to get your link.<br>
+    Paso final... Por favor espera para obtener tu enlace.
+  </div>
 
   <script>
-    const params = new URLSearchParams(window.location.search);
-    const fullName = params.get("name");
-
-    if (fullName && fullName.toLowerCase().endsWith("step1")) {
-      const baseName = fullName.replace(/step1$/i, "").trim();
-      const nextName = `${baseName} step2`;
-      setTimeout(() => {
-        window.location.href = `https://icetea-py.github.io/link-redirector/2step.html?name=${encodeURIComponent(nextName)}`;
-      }, 4000);
-    } else {
-      document.getElementById("message").textContent = "Invalid or missing parameter: name=...step1";
-    }
+    setTimeout(() => {
+      let currentURL = window.location.href;
+      let finalURL = "https://final-link.com"; // burayı senin son linkinle değiştir
+      window.location.href = finalURL;
+    }, 4000);
   </script>
 </body>
 </html>
